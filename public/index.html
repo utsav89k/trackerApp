@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quantum Career Hub - Job Tracker</title>
+  <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons (CDN) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header class="main-header">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <i data-lucide="briefcase"></i>
+        </div>
+        <div>
+          <h1>Quantum Career Hub</h1>
+          <p class="subtitle">Next-gen Job Application Management System</p>
+        </div>
+      </div>
+      <div class="db-status-badge">
+        <span class="pulse-indicator"></span>
+        <i data-lucide="database"></i>
+        <span>MySQL Connected</span>
+      </div>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <main class="workspace-grid">
+      
+      <!-- Section 1: Submit Application Form -->
+      <section class="glass-card section-card" id="submit-section">
+        <div class="card-header">
+          <div class="card-title-icon submit-icon">
+            <i data-lucide="file-plus-2"></i>
+          </div>
+          <div>
+            <h2>Register Application</h2>
+            <p>Log a new job application details</p>
+          </div>
+        </div>
+
+        <form id="application-form" class="interactive-form">
+          <div class="form-row split">
+            <div class="form-group">
+              <label for="job_id"><i data-lucide="hash"></i> Job ID</label>
+              <input type="text" id="job_id" placeholder="e.g. JOB-101" required>
+            </div>
+            <div class="form-group">
+              <label for="job_position"><i data-lucide="award"></i> Job Position</label>
+              <input type="text" id="job_position" placeholder="e.g. Frontend Engineer" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="company_name"><i data-lucide="building-2"></i> Company Name</label>
+            <input type="text" id="company_name" placeholder="e.g. Google" required>
+          </div>
+
+          <div class="form-row split">
+            <div class="form-group">
+              <label for="city"><i data-lucide="map-pin"></i> City</label>
+              <input type="text" id="city" placeholder="e.g. Mountain View">
+            </div>
+            <div class="form-group">
+              <label for="state"><i data-lucide="map"></i> State</label>
+              <input type="text" id="state" placeholder="e.g. CA">
+            </div>
+          </div>
+
+          <div class="form-row split">
+            <div class="form-group">
+              <label for="job_mode"><i data-lucide="pocket"></i> Job Mode</label>
+              <div class="custom-select-wrapper">
+                <select id="job_mode">
+                  <option value="Onsite">Onsite</option>
+                  <option value="Hybrid">Hybrid</option>
+                  <option value="Remote">Remote</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="portal"><i data-lucide="globe"></i> Application Portal</label>
+              <input type="text" id="portal" placeholder="e.g. LinkedIn, Indeed">
+            </div>
+          </div>
+
+          <div class="form-row split">
+            <div class="form-group">
+              <label for="cover_letter"><i data-lucide="file-text"></i> Cover Letter Provided</label>
+              <div class="custom-select-wrapper">
+                <select id="cover_letter">
+                  <option value="Yes">Yes</option>
+                  <option value="No">No</option>
+                  <option value="Tailored">Tailored Cover Letter</option>
+                  <option value="Not Required">Not Required</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="salary"><i data-lucide="dollar-sign"></i> Salary (USD)</label>
+              <input type="number" id="salary" placeholder="e.g. 120000" min="0">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="job_description"><i data-lucide="align-left"></i> Job Description</label>
+            <textarea id="job_description" rows="4" placeholder="Paste description details here..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label><i data-lucide="loader"></i> Response Status (Default)</label>
+            <div class="default-status-badge">
+              <i data-lucide="send"></i> Applied
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="btn-submit">
+            <span>Log Application</span>
+            <i data-lucide="plus-circle"></i>
+          </button>
+        </form>
+      </section>
+
+      <!-- Section 2: Search & Update -->
+      <section class="glass-card section-card" id="update-section">
+        <div class="card-header">
+          <div class="card-title-icon update-icon">
+            <i data-lucide="refresh-cw"></i>
+          </div>
+          <div>
+            <h2>Update Application</h2>
+            <p>Fetch, review, and decide application responses</p>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-box">
+          <div class="search-inputs-grid">
+            <div class="search-input-group">
+              <i data-lucide="search" class="search-icon"></i>
+              <input type="text" id="search-company" placeholder="Search Company Name...">
+            </div>
+            <div class="search-input-group">
+              <i data-lucide="briefcase" class="search-icon"></i>
+              <input type="text" id="search-position" placeholder="Search Job Position...">
+            </div>
+          </div>
+          <button type="button" class="btn btn-secondary" id="btn-search">
+            <span>Search</span>
+            <i data-lucide="sliders-horizontal"></i>
+          </button>
+        </div>
+
+        <!-- Results List Section -->
+        <div class="results-container">
+          <h3 class="section-subtitle"><i data-lucide="list"></i> Matching Applications</h3>
+          <div class="table-wrapper">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th>Job Info</th>
+                  <th>Location</th>
+                  <th>Cover Letter</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="results-tbody">
+                <tr>
+                  <td colspan="4" class="empty-state">
+                    <i data-lucide="inbox"></i>
+                    <p>Enter Company and/or Position to view results</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Detail Preview & Decisions Panel -->
+        <div class="details-panel hidden" id="details-panel">
+          <h3 class="section-subtitle"><i data-lucide="eye"></i> Application File & Decision</h3>
+          
+          <div class="detail-card">
+            <div class="detail-header">
+              <div class="detail-titles">
+                <span class="detail-company" id="detail-company-text">Google</span>
+                <h4 class="detail-position" id="detail-position-text">Frontend Engineer</h4>
+                <div class="detail-meta">
+                  <span id="detail-jobid-text"><i data-lucide="hash"></i> JOB-101</span>
+                  <span id="detail-location-text"><i data-lucide="map-pin"></i> Mountain View, CA</span>
+                </div>
+              </div>
+              <div class="detail-status" id="detail-status-badge">
+                Applied
+              </div>
+            </div>
+
+            <div class="detail-body">
+              <div class="detail-grid">
+                <div class="detail-item">
+                  <span class="label">Cover Letter</span>
+                  <p id="detail-cover-text">Yes</p>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Job Mode</span>
+                  <p id="detail-mode-text">Onsite</p>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Portal</span>
+                  <p id="detail-portal-text">LinkedIn</p>
+                </div>
+                <div class="detail-item">
+                  <span class="label">Salary</span>
+                  <p id="detail-salary-text">$120,000</p>
+                </div>
+              </div>
+              <div class="detail-item">
+                <span class="label">Job Description</span>
+                <p class="description-text" id="detail-desc-text">...</p>
+              </div>
+            </div>
+
+            <!-- Decisions row -->
+            <div class="decision-footer">
+              <p class="decision-prompt">Update Response Status:</p>
+              <div class="decision-buttons">
+                <button type="button" class="btn btn-danger" id="btn-reject">
+                  <i data-lucide="x-circle"></i>
+                  <span>Reject</span>
+                </button>
+                <button type="button" class="btn btn-success" id="btn-approve">
+                  <i data-lucide="check-circle2"></i>
+                  <span>Approved</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast Notification System -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
