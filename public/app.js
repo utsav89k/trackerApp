@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const detailPortalText = document.getElementById('detail-portal-text');
   const detailSalaryText = document.getElementById('detail-salary-text');
   const detailAppliedText = document.getElementById('detail-applied-text');
+  const detailUpdatedText = document.getElementById('detail-updated-text');
   const detailDescText = document.getElementById('detail-desc-text');
   const detailStatusBadge = document.getElementById('detail-status-badge');
   const btnApprove = document.getElementById('btn-approve');
@@ -222,6 +223,21 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
     detailAppliedText.textContent = appliedDateStr;
+
+    // Format and display Last Updated Date
+    let updatedDateStr = 'Never';
+    if (app.updated_at) {
+      const d = new Date(app.updated_at);
+      updatedDateStr = d.toLocaleString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+    detailUpdatedText.textContent = updatedDateStr;
     
     detailDescText.textContent = app.job_description || 'No description provided.';
     
