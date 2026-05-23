@@ -82,8 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       showToast('Application registered successfully!', 'success');
       
-      // Reset Form
-      applicationForm.reset();
+      // Reset only specific fields
+      document.getElementById('job_description').value = '';
+      document.getElementById('company_name').value = '';
+      document.getElementById('job_id').value = '';
       
       // Refresh results list
       fetchApplications();
