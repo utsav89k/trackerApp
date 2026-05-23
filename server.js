@@ -61,11 +61,19 @@ async function getDatabasePool() {
         cover_letter_provided VARCHAR(255),
         response VARCHAR(255) DEFAULT 'Applied',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        updated_at TIMESTAMP NULL DEFAULT NULL
       );
     `;
     await connection.query(createTableQuery);
     console.log('Verified base applications table is present in database.');
+
+    // Ensure existing databases modify updated_at to be nullable and default to NULL
+    try {
+      await connection.query('ALTER TABLE applications MODIFY COLUMN updated_at TIMESTAMP NULL DEFAULT NULL');
+      console.log('Successfully configured updated_at to be nullable and default to NULL.');
+    } catch (err) {
+      console.error('Error migrating updated_at column:', err.message);
+    }
 
     // Dynamic schema migrations: Add missing columns if they don't exist
     const columnsToEnsure = [
@@ -218,7 +226,7 @@ app.put('/api/applications/:id/status', async (req, res) => {
 
   try {
     const db = await getDatabasePool();
-    const query = 'UPDATE applications SET response = ? WHERE id = ?';
+    const query = 'UPDATE applications SET response = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?';
     const [result] = await db.query(query, [status, id]);
 
     if (result.affectedRows === 0) {
