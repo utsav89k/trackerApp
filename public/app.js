@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const detailModeText = document.getElementById('detail-mode-text');
   const detailPortalText = document.getElementById('detail-portal-text');
   const detailSalaryText = document.getElementById('detail-salary-text');
+  const detailAppliedText = document.getElementById('detail-applied-text');
   const detailDescText = document.getElementById('detail-desc-text');
   const detailStatusBadge = document.getElementById('detail-status-badge');
   const btnApprove = document.getElementById('btn-approve');
@@ -206,6 +207,22 @@ document.addEventListener('DOMContentLoaded', () => {
     detailModeText.textContent = app.job_mode || 'Onsite';
     detailPortalText.textContent = app.portal || 'N/A';
     detailSalaryText.textContent = app.salary ? `$${parseInt(app.salary, 10).toLocaleString()}` : 'N/A';
+    
+    // Format and display Applied Date
+    let appliedDateStr = 'N/A';
+    if (app.created_at) {
+      const d = new Date(app.created_at);
+      appliedDateStr = d.toLocaleString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      });
+    }
+    detailAppliedText.textContent = appliedDateStr;
+    
     detailDescText.textContent = app.job_description || 'No description provided.';
     
     // Status Badge styling in panel
