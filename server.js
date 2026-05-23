@@ -59,14 +59,39 @@ async function connectDatabase() {
         cover_letter_provided VARCHAR(255),
         response VARCHAR(255) DEFAULT 'Applied',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        job_mode VARCHAR(255) DEFAULT 'Onsite',
-        portal VARCHAR(255),
-        salary INT
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
       );
     `;
     await connection.query(createTableQuery);
-    console.log('Verified applications table is present in database.');
+    console.log('Verified base applications table is present in database.');
+
+    // Dynamic schema migrations: Add missing columns if they don't exist
+    const columnsToEnsure = [
+      { name: 'job_mode', definition: "VARCHAR(255) DEFAULT 'Onsite'" },
+      { name: 'portal', definition: 'VARCHAR(255)' },
+      { name: 'salary', definition: 'INT' }
+    ];
+
+    for (const column of columnsToEnsure) {
+      try {
+        const checkQuery = `
+          SELECT COLUMN_NAME 
+          FROM INFORMATION_SCHEMA.COLUMNS 
+          WHERE TABLE_SCHEMA = DATABASE() 
+            AND TABLE_NAME = 'applications' 
+            AND COLUMN_NAME = ?
+        `;
+        const [rows] = await connection.query(checkQuery, [column.name]);
+        if (rows.length === 0) {
+          console.log(`Column '${column.name}' is missing. Altering table to add it...`);
+          await connection.query(`ALTER TABLE applications ADD COLUMN ${column.name} ${column.definition}`);
+          console.log(`Successfully added column '${column.name}'.`);
+        }
+      } catch (err) {
+        console.error(`Error ensuring column '${column.name}':`, err.message);
+      }
+    }
+    console.log('Verified all application table columns are present.');
     
     connection.release();
   } catch (error) {
