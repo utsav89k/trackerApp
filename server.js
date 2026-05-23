@@ -149,8 +149,8 @@ app.post('/api/applications', async (req, res) => {
     const db = await getDatabasePool();
     const query = `
       INSERT INTO applications 
-      (job_id, job_position, company_name, city, state, job_description, cover_letter_provided, job_mode, portal, salary, response) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (job_id, job_position, company_name, city, state, job_description, cover_letter_provided, job_mode, portal, salary, response, updated_at) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL)
     `;
     const values = [
       job_id,
