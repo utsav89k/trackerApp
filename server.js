@@ -13,8 +13,10 @@ app.use(express.static('public')); // Serve static frontend files
 
 let pool;
 
-// Connect to MySQL
-async function connectDatabase() {
+// Lazily-initialized connection pool, supporting Vercel serverless functions synchronously
+async function getDatabasePool() {
+  if (pool) return pool;
+
   const config = {
     user: process.env.DB_USER || 'root',
     password: process.env.DB_PASSWORD || '',
@@ -24,7 +26,7 @@ async function connectDatabase() {
     queueLimit: 0,
   };
 
-  // If local Unix socket is available, use it for connection (recommended for mac conda mysql)
+  // If local Unix socket is available, use it for connection
   if (process.env.DB_SOCKET) {
     config.socketPath = process.env.DB_SOCKET;
     console.log(`Connecting to MySQL via Unix socket: ${process.env.DB_SOCKET}`);
@@ -42,11 +44,11 @@ async function connectDatabase() {
 
   try {
     pool = mysql.createPool(config);
-    // Test the connection
+    // Test connection & ensure table exists
     const connection = await pool.getConnection();
     console.log('Successfully connected to MySQL database.');
-    
-    // Auto-create table if it doesn't exist
+
+    // Auto-create base table if it doesn't exist
     const createTableQuery = `
       CREATE TABLE IF NOT EXISTS applications (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -92,16 +94,22 @@ async function connectDatabase() {
       }
     }
     console.log('Verified all application table columns are present.');
-    
     connection.release();
   } catch (error) {
-    console.error('Failed to connect to MySQL database:', error.message);
-    console.log('Retrying in 5 seconds...');
-    setTimeout(connectDatabase, 5000);
+    console.error('Failed to initialize connection or database schema:', error.message);
+    pool = null; // Reset so next request tries again
+    throw error;
   }
+
+  return pool;
 }
 
-connectDatabase();
+// Warm up local database connection synchronously on start (if running locally)
+if (!process.env.VERCEL) {
+  getDatabasePool().catch(err => {
+    console.error('Failed to connect database on startup:', err.message);
+  });
+}
 
 // API Endpoints
 
@@ -130,6 +138,7 @@ app.post('/api/applications', async (req, res) => {
   const parsedSalary = salary ? parseInt(salary, 10) : null;
 
   try {
+    const db = await getDatabasePool();
     const query = `
       INSERT INTO applications 
       (job_id, job_position, company_name, city, state, job_description, cover_letter_provided, job_mode, portal, salary, response) 
@@ -149,7 +158,7 @@ app.post('/api/applications', async (req, res) => {
       response
     ];
 
-    const [result] = await pool.query(query, values);
+    const [result] = await db.query(query, values);
     
     res.status(201).json({
       message: 'Job application registered successfully!',
@@ -180,6 +189,7 @@ app.get('/api/applications/search', async (req, res) => {
   const { company_name = '', job_position = '' } = req.query;
 
   try {
+    const db = await getDatabasePool();
     // We match using LIKE %query% to be search-friendly.
     // If query parameters are empty, it will match all records.
     const query = `
@@ -189,7 +199,7 @@ app.get('/api/applications/search', async (req, res) => {
     `;
     const values = [`%${company_name}%`, `%${job_position}%`];
 
-    const [rows] = await pool.query(query, values);
+    const [rows] = await db.query(query, values);
     res.json(rows);
   } catch (error) {
     console.error('Error searching applications:', error);
@@ -207,8 +217,9 @@ app.put('/api/applications/:id/status', async (req, res) => {
   }
 
   try {
+    const db = await getDatabasePool();
     const query = 'UPDATE applications SET response = ? WHERE id = ?';
-    const [result] = await pool.query(query, [status, id]);
+    const [result] = await db.query(query, [status, id]);
 
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: 'Application not found.' });
