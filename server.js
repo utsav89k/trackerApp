@@ -45,6 +45,29 @@ async function connectDatabase() {
     // Test the connection
     const connection = await pool.getConnection();
     console.log('Successfully connected to MySQL database.');
+    
+    // Auto-create table if it doesn't exist
+    const createTableQuery = `
+      CREATE TABLE IF NOT EXISTS applications (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        job_id VARCHAR(255) NOT NULL,
+        job_position VARCHAR(255) NOT NULL,
+        company_name VARCHAR(255) NOT NULL,
+        city VARCHAR(255),
+        state VARCHAR(255),
+        job_description TEXT,
+        cover_letter_provided VARCHAR(255),
+        response VARCHAR(255) DEFAULT 'Applied',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        job_mode VARCHAR(255) DEFAULT 'Onsite',
+        portal VARCHAR(255),
+        salary INT
+      );
+    `;
+    await connection.query(createTableQuery);
+    console.log('Verified applications table is present in database.');
+    
     connection.release();
   } catch (error) {
     console.error('Failed to connect to MySQL database:', error.message);
